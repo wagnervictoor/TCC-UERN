@@ -5,27 +5,35 @@
  */
 package br.wagner.java.sc;
 
+import javax.ws.rs.core.Context;
+import javax.ws.rs.Produces;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import javax.jws.WebService;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
 
 /**
+ * REST Web Service
  *
  * @author wagnervictor
  */
-@WebService(serviceName = "RetornaTemperatura")
-public class RetornaTemperatura {
+@Path("generic")
+public class GenericResource {
 
-    /**
-     * This is a sample web service operation
-     * @param cidade
-     * @return 
-     */
-    @WebMethod(operationName = "retornaTemperatura")
-     public String retornaTemperaturHora(@WebParam(name = "name") String cidade) {
+    @Context
+    private UriInfo context;
+
+    public GenericResource() {
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("{cidade}")
+    public String getTemperatura(@PathParam("cidade") String cidade) {
         HttpURLConnection connection = null;
         
         String resp ,temp = "";
@@ -53,16 +61,16 @@ public class RetornaTemperatura {
                 default:
                     break;
             }
+            
+            System.out.println(cidade);
+            
             connection = (HttpURLConnection)url.openConnection();
             InputStream content = connection.getInputStream();
             int data = content.read();
             
             int ch;
             sb = new StringBuilder();
-            while((ch = content.read()) != -1) sb.append((char)ch);
-
-            System.out.println(sb);
-            
+            while((ch = content.read()) != -1) sb.append((char)ch);            
             resp = sb.toString();
             
             for (int i = 0; i < resp.length(); i++)
@@ -75,6 +83,7 @@ public class RetornaTemperatura {
                     }
                 }
         }catch(Exception e){
+            e.printStackTrace();
             System.out.println("Não possível receber informações da API!");
         }
         
